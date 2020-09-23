@@ -68,6 +68,28 @@ public class ReceiverProposalOne {
             .blockLast();
     }
 
+    /**
+     * What would you expect the behaviour of the following code is?
+     */
+    private static void task4() {
+        final ServiceBusReceiverClient client = new ServiceBusClientBuilder()
+            .connectionString("Endpoint=sb://sb-java-conniey-4.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=foobar")
+            .receiver()
+            .queueName("session-queue-0")
+            .useSessions()
+            .buildClient();
+
+        // We try accepting the first available session twice.
+        client.acceptSession();
+
+        final IterableStream<ServiceBusReceivedMessage> message = client.receiveMessages(10);
+
+        client.acceptSession();
+
+        final List<ServiceBusReceivedMessage> collect = message.stream().collect(Collectors.toList());
+        System.out.println("Found session events: " + collect.size());
+    }
+
     public static void main(String[] args) {
         System.out.println("START");
         task1();
